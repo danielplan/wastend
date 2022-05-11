@@ -33,10 +33,13 @@ erDiagram
         string item
         int amount
         int ideal_amount
+        string type
     }
+    Recipe }|--|o User : shares
     GroceryCategory o|--|{ Grocery : has
     User o|--|{ Stock : owns
     Grocery o|--|{ Stock : of
     Grocery o|--|{ Ingredient : is
     Recipe o|--|{ Ingredient : contains
+    Recipe o{--}o User : likes
 ```

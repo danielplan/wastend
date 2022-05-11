@@ -48,3 +48,6 @@ households.
 
 ### As a user I can find recipes so that I know what I could cook.
 Depending on the current stock amount of groceries, the application suggests recipes.
+
+### As a user I can share recipes.
+User can create recipes using ingredients and descriptions.
