@@ -1,5 +1,7 @@
 # ER-Diagram
 
+An up-to-date diagram showing the ER-Diagram of the `Model` layer of wastend's architecture.
+
 ```mermaid
 erDiagram
     User {
