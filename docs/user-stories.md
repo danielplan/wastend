@@ -4,8 +4,7 @@ This section defines the user stories of wastend. They are later used to define 
 
 ## User management
 ### As a user I want to create an account so that I can use the application.
-A user can register using an email address, name and password. Also other means
-of registration are possible.
+A user can register using an email address, name and password.
 
 ### As a user I want to create households so that I can use the application
 A user should be able to create a new household giving a name. The household
