@@ -1,7 +1,14 @@
 # User Journeys
-This section will give a deeper look into some activities that users can perform using wastend.
 
-## Onboarding
+This section will give a deeper look into some activities that users can perform using wastend.
+It will briefly show how the system handles user stories.
+Backend logics are represented as Sequence Diagrams, frontend routines are
+state diagrams.
+
+## User management
+
+### Onboarding
+
 ```mermaid
 stateDiagram-v2
     state "On the landing page" as landing_page
@@ -23,11 +30,13 @@ stateDiagram-v2
     onboard --> ready: click on join household
     create_household --> ready: created new household
 ```
-## Create household
+
+### Create household
+
 ```mermaid
 sequenceDiagram
     actor User
-    User ->> HouseholdController: POST /household
+    User ->> HouseholdController: POST /household/:householdId/join
     HouseholdController ->> HouseholdService: createHousehold(req)
     activate HouseholdService
     HouseholdService ->> HouseholdService: validateHousehold(req.household)
@@ -38,7 +47,9 @@ sequenceDiagram
     deactivate HouseholdService
     HouseholdController -->> User: Household
 ```
-## Add user to household
+
+### Add user to household
+
 ```mermaid
 sequenceDiagram
     actor User
@@ -50,4 +61,63 @@ sequenceDiagram
     HouseholdService -->> HouseholdController: Household
     deactivate HouseholdService
     HouseholdController -->> User: Household
+```
+
+## Inventory Management
+
+### Add groceries
+
+```mermaid
+sequenceDiagram
+    actor User
+    User ->> InventoryController: POST /inventory
+    InventoryController ->> InventoryService: addGroceryToHousehold(req)
+    activate InventoryService
+    InventoryService ->> GroceryService: findPossibleGrocery(req)
+    activate GroceryService
+    alt A similar grocery is not found
+        GroceryService ->> Grocery: new Grocery(req.grocery)
+        GroceryService ->> Grocery: save()
+    end
+    GroceryService -->> InventoryService: Grocery
+    deactivate GroceryService
+    InventoryService ->> Stock: new Stock(req.amount, req.household, grocery.id)
+    InventoryService ->> Stock: save()
+    InventoryService -->> InventoryController: Grocery
+    deactivate InventoryService
+    InventoryController -->> User: Grocery
+```
+
+### Update stock value
+
+```mermaid
+sequenceDiagram
+    actor User
+    User ->> InventoryController: POST /inventory/stock
+    InventoryController ->> InventoryService: updateStock(req)
+    activate InventoryService
+    InventoryService ->> Stock: getForHousehold(req.groceryId, req.householdId)
+    InventoryService ->> Stock: setAmount(req.amount)
+    InventoryService ->> Stock: save()
+    InventoryService -->> InventoryController: Amount
+    deactivate InventoryService
+    InventoryController -->> User: Amount
+```
+
+## Shopping list
+
+
+### Retrieve shopping list
+
+```mermaid
+sequenceDiagram
+    actor User
+    User ->> InventoryController: GET /inventory/shopping
+    InventoryController ->> InventoryService: getShoppingList(req)
+    activate InventoryService
+    InventoryService ->> Grocery: getLowOnStock(req.households)
+    Grocery -->> InventoryService: Grocery[]
+    InventoryService -->> InventoryController: Grocery[]
+    deactivate InventoryService
+    InventoryController -->> User: Grocery[]
 ```
