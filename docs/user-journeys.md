@@ -73,9 +73,10 @@ sequenceDiagram
     User ->> InventoryController: POST /inventory
     InventoryController ->> InventoryService: addGroceryToHousehold(req)
     activate InventoryService
-    InventoryService ->> GroceryService: findPossibleGrocery(req)
+    InventoryService ->> GroceryService: getGrocery(req)
     activate GroceryService
-    alt A similar grocery is not found
+    GroceryService ->> Grocery: findGrocery(req.grocery)
+    alt Grocery does not exist yet
         GroceryService ->> Grocery: new Grocery(req.grocery)
         GroceryService ->> Grocery: save()
     end

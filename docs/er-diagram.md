@@ -26,17 +26,20 @@ erDiagram
         int ideal_amount
         string unit
     }
+    Household {
+        string id
+        string name
+    }
     Ingredient {
         string id
         int amount
     }
     Recipe {
         string id
-        string item
-        int amount
-        int ideal_amount
-        string type
+        string description
     }
+    Household }|--|{ User : livesIn
+    Household }|--|o Stock : has
     Recipe }|--|o User : shares
     GroceryCategory o|--|{ Grocery : has
     User o|--|{ Stock : owns
