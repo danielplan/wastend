@@ -63,6 +63,9 @@ class GroceryService {
 class InventoryController {
     
 }
+class UserController {
+    
+}
 class HouseholdController {
     
 }

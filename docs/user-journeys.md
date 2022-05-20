@@ -30,6 +30,24 @@ stateDiagram-v2
     onboard --> ready: click on join household
     create_household --> ready: created new household
 ```
+### Registration
+
+```mermaid
+sequenceDiagram
+    actor User
+    User ->> UserController: POST /user/register
+    UserController ->> UserService: registerUser(req)
+    activate UserService
+    UserService ->> AuthService: register(req.household)
+    AuthService ->> User: new User(req.user)
+    AuthService ->> User: save()
+    UserService ->> AuthService: login(req.user)
+    UserService -->> UserController: Tokens
+    deactivate UserService
+    UserController -->> User: Tokens
+```
+
+## Household Management
 
 ### Create household
 
