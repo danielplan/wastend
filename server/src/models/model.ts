@@ -1,25 +1,34 @@
 import { ValidationError } from '../errors/validation.error';
-import database from '../database';
+import database, { ID_LENGTH } from '../database';
 import { nanoid } from 'nanoid';
 import { Knex } from 'knex';
 
 export default abstract class Model {
 
-    protected id: string;
+    protected id: string | null;
 
-    protected constructor(id?: string) {
-        if (id) {
-            this.get(id);
+    protected constructor(data?: any) {
+        if (data) {
+            if (typeof data == 'string') {
+                this.get(data);
+            } else {
+                this.fromJsonObject(data);
+            }
         }
     }
 
-    public abstract get(id: string): void;
+    protected get(id: string): void {
+        const result = this.getQuery().where('id', id).first();
+        this.fromJsonObject(result);
+    }
 
     protected abstract getTableName(): string;
 
     public abstract validate(): string[];
 
-    public abstract toJSONObject(): any;
+    protected abstract toDBObject(): any;
+
+    protected abstract fromJsonObject(data: any): void;
 
     public async save(): Promise<void> {
         const validation = this.validate();
@@ -34,12 +43,13 @@ export default abstract class Model {
     }
 
     protected async update(id: string): Promise<void> {
-        await this.getQuery().update(this.toJSONObject()).where('id', id);
+        await this.getQuery().update(this.toDBObject()).where('id', id);
     }
 
     protected async add(): Promise<void> {
         const id = await this.getFreeId();
-        await this.getQuery().insert({ ...this.toJSONObject(), id });
+        this.id = id;
+        await this.getQuery().insert({ ...this.toDBObject(), id});
     }
 
 
@@ -52,7 +62,7 @@ export default abstract class Model {
         let id: string;
         let duplicate: any;
         do {
-            id = nanoid(15);
+            id = nanoid(ID_LENGTH);
             duplicate = await this.getQuery().where('id', id).first();
         } while (duplicate != null);
         return id;
