@@ -7,19 +7,10 @@ export default abstract class Model {
 
     protected id: string | null;
 
-    protected constructor(data?: any) {
+    protected constructor(data?: object) {
         if (data) {
-            if (typeof data == 'string') {
-                this.get(data);
-            } else {
-                this.fromJsonObject(data);
-            }
+            this.fromJsonObject(data);
         }
-    }
-
-    protected get(id: string): void {
-        const result = this.getQuery().where('id', id).first();
-        this.fromJsonObject(result);
     }
 
     protected abstract getTableName(): string;
@@ -49,7 +40,7 @@ export default abstract class Model {
     protected async add(): Promise<void> {
         const id = await this.getFreeId();
         this.id = id;
-        await this.getQuery().insert({ ...this.toDBObject(), id});
+        await this.getQuery().insert({ ...this.toDBObject(), id });
     }
 
 
