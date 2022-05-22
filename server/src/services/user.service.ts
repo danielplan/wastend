@@ -3,7 +3,7 @@ import { comparePasswords, createSession, encryptPassword, Tokens } from './auth
 
 export async function registerUser(name: string, email: string, password: string): Promise<Tokens> {
     const passwordHash = await encryptPassword(password);
-    const user = new User({name, email, password, password_hash: passwordHash});
+    const user = new User({name, email, password, passwordHash});
     await user.save();
     return await createSession(user);
 }

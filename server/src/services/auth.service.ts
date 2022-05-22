@@ -33,7 +33,7 @@ export async function comparePasswords(password: string, passwordHash: string): 
 }
 
 export async function createSession(user: User): Promise<Tokens> {
-    const session = new Session({user_id: user.id});
+    const session = new Session({userId: user.id});
     await session.save();
     const accessToken = signJWT({email: user.email, userId: user.id, sessionId: session.id}, "5m");
     const refreshToken = signJWT({sessionId: session.id}, "1y");

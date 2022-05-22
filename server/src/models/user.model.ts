@@ -7,9 +7,9 @@ export default class User extends Model {
     public email: string;
     public password: string;
     public passwordHash: string | null;
-    private static TABLE_NAME = 'user';
+    static TABLE_NAME = 'user';
 
-    constructor(data?: any) {
+    constructor(data: { id?: string, name: string, email: string, password: string, passwordHash: string }) {
         super(data);
     }
 
@@ -24,12 +24,12 @@ export default class User extends Model {
         return errors;
     }
 
-    protected fromJsonObject(data: any): void {
-        const { id, name, email, password_hash, password } = data;
+    protected fromDBObject(data: any): void {
+        const { id, name, email, passwordHash, password } = data;
         this.id = id;
         this.name = name;
         this.email = email;
-        this.passwordHash = password_hash;
+        this.passwordHash = passwordHash;
         this.password = password;
     }
 
@@ -45,7 +45,7 @@ export default class User extends Model {
         return {
             name: this.name,
             email: this.email,
-            password_hash: this.passwordHash,
+            passwordHash: this.passwordHash,
         };
     }
 
@@ -58,6 +58,5 @@ export default class User extends Model {
         if (!result) return null;
         return new User(result);
     }
-
 
 }

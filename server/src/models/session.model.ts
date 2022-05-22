@@ -9,10 +9,10 @@ export default class Session extends Model {
         super(data);
     }
 
-    protected fromJsonObject(data: any): void {
-        const { id, user_id } = data;
+    protected fromDBObject(data: { id?: string, userId: string }): void {
+        const { id, userId } = data;
         this.id = id;
-        this.userId = user_id;
+        this.userId = userId;
     }
 
     protected getTableName(): string {
@@ -22,7 +22,7 @@ export default class Session extends Model {
     protected toDBObject(): any {
         return {
             id: this.id,
-            user_id: this.userId,
+            userId: this.userId,
         };
     }
 

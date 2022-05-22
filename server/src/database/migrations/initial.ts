@@ -8,18 +8,18 @@ export async function up(knex: Knex): Promise<void> {
             table.string('name').notNullable();
         })
         .createTable('household_has_user', (table) => {
-            table.string('household_id', ID_LENGTH).references('id').inTable('household').primary();
-            table.string('user_id', ID_LENGTH).references('id').inTable('user').primary();
+            table.string('householdId', ID_LENGTH).references('id').inTable('household').primary();
+            table.string('userId', ID_LENGTH).references('id').inTable('user').primary();
         })
         .createTable('user', (table) => {
             table.string('id', ID_LENGTH).primary();
             table.string('email').notNullable().index('user_email').unique();
-            table.string('password_hash').notNullable();
+            table.string('passwordHash').notNullable();
             table.string('name').notNullable();
         })
         .createTable('user_session', (table) => {
             table.string('id', ID_LENGTH).primary();
-            table.string('user_id', ID_LENGTH).references('id').inTable('user').notNullable();
+            table.string('userId', ID_LENGTH).references('id').inTable('user').notNullable();
         })
         .createTable('grocery_category', (table) => {
             table.string('id', ID_LENGTH).primary();
@@ -28,13 +28,13 @@ export async function up(knex: Knex): Promise<void> {
         .createTable('grocery', (table) => {
             table.string('id', ID_LENGTH).primary();
             table.string('name').notNullable();
-            table.string('category_id', ID_LENGTH).references('id').inTable('grocery_category').notNullable();
+            table.string('categoryId', ID_LENGTH).references('id').inTable('grocery_category').notNullable();
         })
         .createTable('stock', (table) => {
             table.string('id', ID_LENGTH).primary();
-            table.string('household_id', ID_LENGTH).references('id').inTable('household').notNullable();
-            table.string('user_id', ID_LENGTH).references('id').inTable('user').notNullable();
-            table.string('grocery_id', ID_LENGTH).references('id').inTable('grocery').notNullable();
+            table.string('householdId', ID_LENGTH).references('id').inTable('household').notNullable();
+            table.string('userId', ID_LENGTH).references('id').inTable('user').notNullable();
+            table.string('groceryId', ID_LENGTH).references('id').inTable('grocery').notNullable();
         });
 }
 

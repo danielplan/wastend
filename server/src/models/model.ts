@@ -7,10 +7,8 @@ export default abstract class Model {
 
     protected id: string | null;
 
-    protected constructor(data?: object) {
-        if (data) {
-            this.fromJsonObject(data);
-        }
+    protected constructor(data: object) {
+        this.fromDBObject(data);
     }
 
     protected abstract getTableName(): string;
@@ -19,7 +17,7 @@ export default abstract class Model {
 
     protected abstract toDBObject(): any;
 
-    protected abstract fromJsonObject(data: any): void;
+    protected abstract fromDBObject(data: any): void;
 
     public async save(): Promise<void> {
         const validation = this.validate();
