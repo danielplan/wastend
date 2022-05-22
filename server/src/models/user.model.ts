@@ -7,7 +7,8 @@ export default class User extends Model {
     public email: string;
     public password: string;
     public passwordHash: string | null;
-    static TABLE_NAME = 'user';
+    public readonly TABLE_NAME: string = 'user';
+    public static readonly TABLE_NAME: string = 'user';
 
     constructor(data: { id?: string, name: string, email: string, password: string, passwordHash: string }) {
         super(data);
@@ -49,12 +50,8 @@ export default class User extends Model {
         };
     }
 
-    protected getTableName(): string {
-        return User.TABLE_NAME;
-    }
-
     static async getByEmail(email: string): Promise<User> | null {
-        const result = await database(this.TABLE_NAME).where('email', email).first();
+        const result = await User.getQuery().where('email', email).first();
         if (!result) return null;
         return new User(result);
     }

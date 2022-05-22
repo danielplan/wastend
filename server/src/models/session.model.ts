@@ -1,7 +1,9 @@
-import Model from './model';
+import Model, { Table } from './model';
 
 export default class Session extends Model {
 
+    public readonly TABLE_NAME: string = 'user_session';
+    public static readonly TABLE_NAME: string = 'user_session';
     public id: string | null;
     public userId: string;
 
@@ -13,10 +15,6 @@ export default class Session extends Model {
         const { id, userId } = data;
         this.id = id;
         this.userId = userId;
-    }
-
-    protected getTableName(): string {
-        return 'user_session';
     }
 
     protected toDBObject(): any {
