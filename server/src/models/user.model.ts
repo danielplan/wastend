@@ -1,14 +1,12 @@
-import Model from './model';
-import database from '../database';
+import Model, { Table } from './model';
 
+@Table('user')
 export default class User extends Model {
     public id: string | null;
     public name: string;
     public email: string;
     public password: string;
     public passwordHash: string | null;
-    public readonly TABLE_NAME: string = 'user';
-    public static readonly TABLE_NAME: string = 'user';
 
     constructor(data: { id?: string, name: string, email: string, password: string, passwordHash: string }) {
         super(data);
@@ -51,7 +49,7 @@ export default class User extends Model {
     }
 
     static async getByEmail(email: string): Promise<User> | null {
-        const result = await User.getQuery().where('email', email).first();
+        const result = await this.getQuery().where('email', email).first();
         if (!result) return null;
         return new User(result);
     }

@@ -3,11 +3,17 @@ import database, { ID_LENGTH } from '../database';
 import { nanoid } from 'nanoid';
 import { Knex } from 'knex';
 
+export function Table(name: string) {
+    return function(constructor: Function) {
+        constructor.prototype.TABLE_NAME = name;
+    };
+}
+
+@Table('')
 export default abstract class Model {
 
     protected id: string | null;
-    public readonly TABLE_NAME: string = '';
-    public static readonly TABLE_NAME: string = '';
+    private TABLE_NAME: string;
 
     protected constructor(data: object) {
         this.fromDBObject(data);
@@ -42,14 +48,21 @@ export default abstract class Model {
     }
 
 
+    public getTableName(): string {
+        return this.TABLE_NAME;
+    }
+
+    public static getTableName(): string {
+        return this.prototype.TABLE_NAME;
+    }
+
     protected getQuery(): Knex.QueryBuilder {
-        return database(this.TABLE_NAME);
+        return database(this.getTableName());
     }
 
     protected static getQuery(): Knex.QueryBuilder {
-        return database(this.TABLE_NAME);
+        return database(this.getTableName());
     }
-
 
     private async getFreeId(): Promise<string> {
         let id: string;

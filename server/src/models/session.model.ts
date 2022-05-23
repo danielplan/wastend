@@ -1,13 +1,12 @@
 import Model, { Table } from './model';
 
+@Table('user_session')
 export default class Session extends Model {
 
-    public readonly TABLE_NAME: string = 'user_session';
-    public static readonly TABLE_NAME: string = 'user_session';
     public id: string | null;
     public userId: string;
 
-    constructor(data?: any) {
+    constructor(data: { id?: string, userId: string }) {
         super(data);
     }
 
