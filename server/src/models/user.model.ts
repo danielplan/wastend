@@ -14,7 +14,8 @@ export default class User extends Model {
     public id: string | null;
     public name: string;
     public email: string;
-    @DBIgnore() public password: string;
+    @DBIgnore()
+    public password: string;
     public passwordHash: string | null;
 
     constructor(data: UserData) {
@@ -43,7 +44,7 @@ export default class User extends Model {
     static async getByEmail(email: string): Promise<User> | null {
         const result = await this.getQuery().where('email', email).first();
         if (!result) return null;
-        return new User(result);
+        return this.wrap(result);
     }
 
 }

@@ -36,9 +36,13 @@ export default abstract class Model {
         for (let key of Object.keys(data)) {
             try {
                 Object.defineProperty(this, key, {
-                    value: data[key]
+                    value: data[key],
+                    writable: true,
+                    configurable: true,
+                    enumerable: true,
                 });
-            } catch (e) {}
+            } catch (e) {
+            }
         }
     }
 
@@ -79,6 +83,27 @@ export default abstract class Model {
 
     protected static getQuery(): Knex.QueryBuilder {
         return database(this.getTableName());
+    }
+
+    protected static wrap(data: any) {
+        if (data instanceof Array) {
+            return data.map((d) => this.wrapSingle(d));
+        }
+        return this.wrapSingle(data);
+    }
+
+    private static wrapSingle(data: any) {
+        let obj: any = {};
+
+        for (let key of Object.keys(data)) {
+            obj[key] = {
+                writable: true,
+                configurable: true,
+                enumerable: true,
+                value: data[key],
+            };
+        }
+        return Object.create(this.prototype, obj);
     }
 
     private async getFreeId(): Promise<string> {
