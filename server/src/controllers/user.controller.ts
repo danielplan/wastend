@@ -20,6 +20,7 @@ export async function registerController(req: Request, res: Response) {
     try {
         tokens = await registerUser(name, email, password);
     } catch (e) {
+        console.error(e);
         if(e instanceof ValidationError) {
             return res.status(500).json(e.errors);
         }

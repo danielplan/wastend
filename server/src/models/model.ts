@@ -2,12 +2,8 @@ import { ValidationError } from '../errors/validation.error';
 import database, { ID_LENGTH } from '../database';
 import { nanoid } from 'nanoid';
 import { Knex } from 'knex';
+import { isDBIgnored, Table } from './decorators';
 
-export function Table(name: string) {
-    return function(constructor: Function) {
-        constructor.prototype.TABLE_NAME = name;
-    };
-}
 
 @Table('')
 export default abstract class Model {
@@ -21,9 +17,30 @@ export default abstract class Model {
 
     public abstract validate(): string[];
 
-    protected abstract toDBObject(): any;
+    protected toDBObject(): any {
+        const data = Object.getOwnPropertyDescriptors(this);
+        const keys = Object.keys(data);
+        let obj: any = {};
+        for (let key of keys) {
+            if (!isDBIgnored(this, key)) {
+                const value = data[key]['value'];
+                if (value) {
+                    obj[key] = value;
+                }
+            }
+        }
+        return obj;
+    }
 
-    protected abstract fromDBObject(data: any): void;
+    protected fromDBObject(data: any): void {
+        for (let key of Object.keys(data)) {
+            try {
+                Object.defineProperty(this, key, {
+                    value: data[key]
+                });
+            } catch (e) {}
+        }
+    }
 
     public async save(): Promise<void> {
         const validation = this.validate();
