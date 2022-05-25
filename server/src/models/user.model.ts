@@ -43,7 +43,6 @@ export default class User extends Model {
 
     static async getByEmail(email: string): Promise<User> | null {
         const result = await this.getQuery().where('email', email).first();
-        if (!result) return null;
         return this.wrap(result);
     }
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser } from '../services/user.service';
+import { registerUser, loginUser, updateUser } from '../services/user.service';
 import { ValidationError } from '../errors/validation.error';
 
 export async function loginController(req: Request, res: Response) {
@@ -23,9 +23,22 @@ export async function registerController(req: Request, res: Response) {
         if(e instanceof ValidationError) {
             return res.status(500).json(e.errors);
         }
-        console.error(e);
         return res.status(500).json(e.message);
     }
     return res.status(200).json(tokens);
+}
+
+export async function updateUserController(req: Request, res: Response) {
+    const id = req.params.id;
+    const { name, email, password } = req.body;
+    try {
+        await updateUser(id, name, email, password);
+    } catch (e) {
+        if(e instanceof ValidationError) {
+            return res.status(500).json(e.errors);
+        }
+        return res.status(500).json(e.message);
+    }
+    return res.status(200).json({success: true});
 }
 

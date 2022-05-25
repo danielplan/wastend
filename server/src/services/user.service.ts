@@ -16,3 +16,14 @@ export async function loginUser(email: string, password: string) {
     return await createSession(user);
 }
 
+export async function updateUser(id: string, name: string, email: string, password: string): Promise<void> {
+    const user = await User.get(id) as User;
+    let passwordHash;
+    if(password) {
+        passwordHash = await encryptPassword(password);
+    }
+    user.fromDBObject({name, email, password, passwordHash});
+    await user.save();
+}
+
+

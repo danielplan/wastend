@@ -17,6 +17,11 @@ export default abstract class Model {
 
     public abstract validate(): string[];
 
+    public static async get(id: string): Promise<Model> | null {
+        const result = await this.getQuery().where('id', id).first();
+        return this.wrap(result);
+    }
+
     protected toDBObject(): any {
         const data = Object.getOwnPropertyDescriptors(this);
         const keys = Object.keys(data);
@@ -32,16 +37,18 @@ export default abstract class Model {
         return obj;
     }
 
-    protected fromDBObject(data: any): void {
+    public fromDBObject(data: any): void {
         for (let key of Object.keys(data)) {
-            try {
-                Object.defineProperty(this, key, {
-                    value: data[key],
-                    writable: true,
-                    configurable: true,
-                    enumerable: true,
-                });
-            } catch (e) {
+            if(data[key]) {
+                try {
+                    Object.defineProperty(this, key, {
+                        value: data[key],
+                        writable: true,
+                        configurable: true,
+                        enumerable: true,
+                    });
+                } catch (e) {
+                }
             }
         }
     }
@@ -86,6 +93,7 @@ export default abstract class Model {
     }
 
     protected static wrap(data: any) {
+        if(data == null) return null;
         if (data instanceof Array) {
             return data.map((d) => this.wrapSingle(d));
         }
