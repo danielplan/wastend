@@ -28,4 +28,11 @@ export async function updateUser(id: string, name: string, email: string, passwo
     await user.save();
 }
 
+export async function getUser(id: string): Promise<object> {
+    const user = await User.get(id) as User;
+    const userObject = user.toDBObject();
+    userObject.passwordHash = undefined;
+    return userObject;
+}
+
 

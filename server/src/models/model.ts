@@ -22,7 +22,7 @@ export default abstract class Model {
         return this.wrap(result);
     }
 
-    protected toDBObject(): any {
+    public toDBObject(): any {
         const data = Object.getOwnPropertyDescriptors(this);
         const keys = Object.keys(data);
         let obj: any = {};

@@ -12,8 +12,9 @@ export default async function requireAuth(req: AuthRequest, res: Response, next:
     const refreshToken = req.headers['refresh-token'] as string;
 
     if (!accessToken) {
-        return next();
+        return res.status(401).send();
     }
+
 
     let { expired, payload } = verifyJWT(accessToken);
 
@@ -25,13 +26,13 @@ export default async function requireAuth(req: AuthRequest, res: Response, next:
     payload = expired && refreshToken ? verifyJWT(refreshToken).payload as RefreshToken : null;
 
     if (!payload) {
-        return next();
+        return res.status(401).send();
     }
 
     const session = await Session.get(payload.sessionId) as Session;
 
     if (!session) {
-        return next();
+        return res.status(401).send();
     }
 
     const newAccessToken = signJWT(session, '5s');

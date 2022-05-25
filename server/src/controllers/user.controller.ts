@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser, updateUser } from '../services/user.service';
+import { registerUser, loginUser, updateUser, getUser } from '../services/user.service';
 import { ValidationError } from '../errors/validation.error';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
@@ -42,4 +42,17 @@ export async function updateUserController(req: AuthRequest, res: Response) {
     }
     return res.status(200).json({success: true});
 }
+
+export async function getUserController(req: AuthRequest, res: Response) {
+    const id = req.user.userId;
+    let data;
+    try {
+        data = await getUser(id);
+    } catch (e) {
+        return res.status(500).json(e.message);
+    }
+    return res.status(200).json(data);
+}
+
+
 

@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../src/app';
 import User from '../src/models/user.model';
+import { nanoid } from 'nanoid';
 
 const apiBase = '';
 
@@ -9,16 +10,19 @@ describe('USER API', () => {
     describe('POST /user', () => {
 
         it('should register correct user correctly', async () => {
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
             const response = await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test@email.com',
-                password: 'password123',
+                name,
+                email,
+                password,
             });
-            const databaseEntry = await User.getByEmail('test@email.com');
+            const databaseEntry = await User.getByEmail(email);
             expect(response.status).toBe(200);
             expect(databaseEntry).toBeTruthy();
             expect(databaseEntry.password).toBeUndefined();
-            expect(databaseEntry.passwordHash).not.toBe('password123');
+            expect(databaseEntry.passwordHash).not.toBe(password);
         });
 
         it('should should fail for incorrect data', async () => {
@@ -49,26 +53,30 @@ describe('USER API', () => {
         });
 
         it('should fail for same email twice', async () => {
+            const email = nanoid(10) + '@email.com';
             let response = await request(app).post(`${apiBase}/user`).send({
                 name: 'Test user',
-                email: 'test@email2.com',
+                email,
                 password: 'password123',
             });
 
             expect(response.status).toBe(200);
             response = await request(app).post(`${apiBase}/user`).send({
                 name: 'Test user',
-                email: 'test@email2.com',
+                email,
                 password: 'password123',
             });
 
             expect(response.status).toBe(500);
         });
         it('should give token pair', async () => {
-            let response = await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test@email3.com',
-                password: 'password123',
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
+            const response = await request(app).post(`${apiBase}/user`).send({
+                name,
+                email,
+                password,
             });
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
@@ -78,14 +86,17 @@ describe('USER API', () => {
     });
     describe('POST /user/login', () => {
         it('should login correct user correctly', async () => {
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
             await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test@email.com',
-                password: 'password123',
+                name,
+                email,
+                password,
             });
             const response = await request(app).post(`${apiBase}/user/login`).send({
-                email: 'test@email.com',
-                password: 'password123',
+                email,
+                password,
             });
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
@@ -94,89 +105,149 @@ describe('USER API', () => {
         });
 
         it('should fail for incorrect user data', async () => {
+            await request(app).post(`${apiBase}/user`).send({
+                name: 'Test user',
+                email: 'real@email.com',
+                password: 'password',
+            });
             let response = await request(app).post(`${apiBase}/user/login`).send({
                 email: 'test@email.com',
-                password: 'password1234',
+                password: 'password',
             });
             expect(response.status).toBe(500);
             response = await request(app).post(`${apiBase}/user/login`).send({
                 email: 'testx@email.com',
-                password: 'password123',
+                password: 'wrongpassword',
             });
             expect(response.status).toBe(500);
         });
     });
     describe('PUT /user', () => {
         it('should update correctly', async () => {
-            await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test@email.com',
-                password: 'password123',
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
+
+            //register
+            const { body: tokens } = await request(app).post(`${apiBase}/user`).send({
+                name,
+                email,
+                password,
             });
-            const {body: tokens} = await request(app).post(`${apiBase}/user/login`).send({
-                email: 'test@email.com',
-                password: 'password123',
-            });
-            const databaseEntry = await User.getByEmail('test@email.com');
+
+            const databaseEntry = await User.getByEmail(email);
             const { accessToken, refreshToken } = tokens;
+
+            const newName = nanoid(10);
+            const newEmail = nanoid(10) + '@email.com';
+            const newPassword = nanoid(10);
+
             const response = await request(app).put(`${apiBase}/user`)
                 .set('access-token', accessToken)
                 .set('refresh-token', refreshToken).send({
-                    email: 'test5@email.com',
-                    password: 'password1235',
-                    name: 'asdfuser',
+                    name: newName,
+                    email: newEmail,
+                    password: newPassword,
                 });
+
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
-            const user = await User.get(databaseEntry.id) as User;
-            expect(user.name).toBe('asdfuser');
-            expect(user.email).toBe('test5@email.com');
 
+            const user = await User.get(databaseEntry.id) as User;
+            expect(user.name).toBe(newName);
+            expect(user.email).toBe(newEmail);
         });
 
         it('should update only parts correctly', async () => {
-            await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test@emaildsafasdf.com',
-                password: 'password123',
-            });
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
 
-            const databaseEntry = await User.getByEmail('test@emaildsafasdf.com');
-
-            const { body: tokens } = await request(app).post(`${apiBase}/user/login`).send({
-                email: 'test@emaildsafasdf.com',
-                password: 'password123',
+            //register
+            const { body: tokens } = await request(app).post(`${apiBase}/user`).send({
+                name,
+                email,
+                password,
             });
+            const databaseEntry = await User.getByEmail(email);
             const { accessToken, refreshToken } = tokens;
+
+            const newName = nanoid(10);
+
             const response = await request(app).put(`${apiBase}/user`)
                 .set('access-token', accessToken)
                 .set('refresh-token', refreshToken)
                 .send({
-                    name: 'asdfuser',
+                    name: newName,
                 });
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
-            const user = await User.get(databaseEntry.id) as User;
-            expect(user.name).toBe('asdfuser');
-            expect(user.email).toBe('test@emaildsafasdf.com');
 
+            const user = await User.get(databaseEntry.id) as User;
+            expect(user.name).toBe(newName);
+            expect(user.email).toBe(email);
         });
 
         it('should fail for incorrect user data', async () => {
-            const { body: loginData } = await request(app).post(`${apiBase}/user`).send({
-                name: 'Test user',
-                email: 'test234234234@email.com',
-                password: 'password123',
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
+
+            //register
+            const { body: tokens } = await request(app).post(`${apiBase}/user`).send({
+                name,
+                email,
+                password,
             });
-            const { accessToken, refreshToken } = loginData;
+            const { accessToken, refreshToken } = tokens;
+
             let response = await request(app).put(`${apiBase}/user`)
                 .set('access-token', accessToken)
                 .set('refresh-token', refreshToken)
                 .send({
                     email: 'test.com',
-                    password: 'passwor',
+                    password: 'passw',
                 });
             expect(response.status).toBe(500);
+        });
+        it('should fail for no authorization', async () => {
+            let response = await request(app).put(`${apiBase}/user`)
+                .send({
+                    email: 'test@email.com',
+                    password: 'passwor',
+                });
+            expect(response.status).toBe(401);
+        });
+    });
+    describe('GET /user', () => {
+
+        it('should get correct user', async () => {
+            const name = nanoid(10);
+            const email = nanoid(10) + '@email.com';
+            const password = nanoid(10);
+
+            const { body: tokens } = await request(app).post(`${apiBase}/user`).send({
+                name,
+                email,
+                password,
+            });
+
+            const { accessToken, refreshToken } = tokens;
+            const response = await request(app).get(`${apiBase}/user`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send();
+            expect(response.status).toBe(200);
+            expect(response.body).toBeTruthy();
+            expect(response.body.name).toBe(name);
+            expect(response.body.email).toBe(email);
+            expect(response.body.passwordHash).toBeUndefined();
+        });
+
+        it('should fail for no authorization', async () => {
+            let response = await request(app).get(`${apiBase}/user`)
+                .send();
+            expect(response.status).toBe(401);
         });
     });
 });

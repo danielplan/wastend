@@ -1,11 +1,17 @@
 import { Router } from 'express';
-import { loginController, registerController, updateUserController } from '../controllers/user.controller';
+import {
+    getUserController,
+    loginController,
+    registerController,
+    updateUserController,
+} from '../controllers/user.controller';
 import requireAuth from '../middlewares/auth.middleware';
 
 const router = Router();
 
+router.get('/', requireAuth, getUserController);
 router.post('/', registerController);
-router.post('/login', loginController);
 router.put('/', requireAuth, updateUserController);
+router.post('/login', loginController);
 
 export default router;
