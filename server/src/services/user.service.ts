@@ -1,5 +1,7 @@
 import User from '../models/user.model';
-import { comparePasswords, createSession, encryptPassword, Tokens } from './auth.service';
+import { createSession, Tokens } from './auth.service';
+import { comparePasswords, encryptPassword } from '../helpers/auth.helpers';
+
 
 export async function registerUser(name: string, email: string, password: string): Promise<Tokens> {
     const passwordHash = await encryptPassword(password);

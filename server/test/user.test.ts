@@ -106,19 +106,26 @@ describe('USER API', () => {
             expect(response.status).toBe(500);
         });
     });
-    describe('PUT /user/:id', () => {
+    describe('PUT /user', () => {
         it('should update correctly', async () => {
             await request(app).post(`${apiBase}/user`).send({
                 name: 'Test user',
                 email: 'test@email.com',
                 password: 'password123',
             });
-            const databaseEntry = await User.getByEmail('test@email.com');
-            const response = await request(app).put(`${apiBase}/user/${databaseEntry.id}`).send({
-                email: 'test5@email.com',
-                password: 'password1235',
-                name: 'asdfuser'
+            const {body: tokens} = await request(app).post(`${apiBase}/user/login`).send({
+                email: 'test@email.com',
+                password: 'password123',
             });
+            const databaseEntry = await User.getByEmail('test@email.com');
+            const { accessToken, refreshToken } = tokens;
+            const response = await request(app).put(`${apiBase}/user`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken).send({
+                    email: 'test5@email.com',
+                    password: 'password1235',
+                    name: 'asdfuser',
+                });
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
             const user = await User.get(databaseEntry.id) as User;
@@ -130,32 +137,45 @@ describe('USER API', () => {
         it('should update only parts correctly', async () => {
             await request(app).post(`${apiBase}/user`).send({
                 name: 'Test user',
-                email: 'test@email.com',
+                email: 'test@emaildsafasdf.com',
                 password: 'password123',
             });
-            const databaseEntry = await User.getByEmail('test@email.com');
-            const response = await request(app).put(`${apiBase}/user/${databaseEntry.id}`).send({
-                name: 'asdfuser'
+
+            const databaseEntry = await User.getByEmail('test@emaildsafasdf.com');
+
+            const { body: tokens } = await request(app).post(`${apiBase}/user/login`).send({
+                email: 'test@emaildsafasdf.com',
+                password: 'password123',
             });
+            const { accessToken, refreshToken } = tokens;
+            const response = await request(app).put(`${apiBase}/user`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name: 'asdfuser',
+                });
             expect(response.status).toBe(200);
             expect(response.body).toBeTruthy();
             const user = await User.get(databaseEntry.id) as User;
             expect(user.name).toBe('asdfuser');
-            expect(user.email).toBe('test@email.com');
+            expect(user.email).toBe('test@emaildsafasdf.com');
 
         });
 
         it('should fail for incorrect user data', async () => {
-            await request(app).post(`${apiBase}/user`).send({
+            const { body: loginData } = await request(app).post(`${apiBase}/user`).send({
                 name: 'Test user',
-                email: 'test@email.com',
+                email: 'test234234234@email.com',
                 password: 'password123',
             });
-            const databaseEntry = await User.getByEmail('test@email.com');
-            let response = await request(app).put(`${apiBase}/user/${databaseEntry.id}`).send({
-                email: 'test.com',
-                password: 'passwor',
-            });
+            const { accessToken, refreshToken } = loginData;
+            let response = await request(app).put(`${apiBase}/user`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    email: 'test.com',
+                    password: 'passwor',
+                });
             expect(response.status).toBe(500);
         });
     });

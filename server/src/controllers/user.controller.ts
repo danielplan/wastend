@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { registerUser, loginUser, updateUser } from '../services/user.service';
 import { ValidationError } from '../errors/validation.error';
+import { AuthRequest } from '../middlewares/auth.middleware';
 
 export async function loginController(req: Request, res: Response) {
     const { email, password } = req.body;
@@ -28,8 +29,8 @@ export async function registerController(req: Request, res: Response) {
     return res.status(200).json(tokens);
 }
 
-export async function updateUserController(req: Request, res: Response) {
-    const id = req.params.id;
+export async function updateUserController(req: AuthRequest, res: Response) {
+    const id = req.user.userId;
     const { name, email, password } = req.body;
     try {
         await updateUser(id, name, email, password);
