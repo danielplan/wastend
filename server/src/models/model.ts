@@ -18,6 +18,9 @@ export default abstract class Model {
     public abstract validate(): string[];
 
     public static async get(id: string): Promise<Model> | null {
+        if(!id) {
+            throw new Error('No id given at get');
+        }
         const result = await this.getQuery().where('id', id).first();
         return this.wrap(result);
     }

@@ -1,4 +1,5 @@
 import { close, migrate } from '../src/database';
+export const apiBase = '';
 
 beforeAll(async () => {
     await migrate();

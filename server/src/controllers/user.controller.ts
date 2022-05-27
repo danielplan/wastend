@@ -12,7 +12,6 @@ export async function loginController(req: Request, res: Response) {
         return res.status(500).json(e.message);
     }
     return res.status(200).json(tokens);
-
 }
 
 export async function registerController(req: Request, res: Response) {

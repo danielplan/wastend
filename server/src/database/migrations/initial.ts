@@ -3,19 +3,20 @@ import { ID_LENGTH } from '../index';
 
 export async function up(knex: Knex): Promise<void> {
     return knex.schema
-        .createTable('household', (table) => {
-            table.string('id', ID_LENGTH).primary();
-            table.string('name').notNullable();
-        })
-        .createTable('household_has_user', (table) => {
-            table.string('householdId', ID_LENGTH).references('id').inTable('household').primary();
-            table.string('userId', ID_LENGTH).references('id').inTable('user').primary();
-        })
         .createTable('user', (table) => {
             table.string('id', ID_LENGTH).primary();
             table.string('email').notNullable().index('user_email').unique();
             table.string('passwordHash').notNullable();
             table.string('name').notNullable();
+        })
+        .createTable('household', (table) => {
+            table.string('id', ID_LENGTH).primary();
+            table.string('name').notNullable();
+        })
+        .createTable('household_has_user', (table) => {
+            table.string('id', ID_LENGTH).primary();
+            table.string('householdId', ID_LENGTH).references('id').inTable('household');
+            table.string('userId', ID_LENGTH).references('id').inTable('user');
         })
         .createTable('user_session', (table) => {
             table.string('id', ID_LENGTH).primary();

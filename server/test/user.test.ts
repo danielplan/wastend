@@ -2,9 +2,23 @@ import request from 'supertest';
 import app from '../src/app';
 import User from '../src/models/user.model';
 import { nanoid } from 'nanoid';
+import { apiBase } from './setupTest';
+import { Tokens } from '../src/services/auth.service';
 
-const apiBase = '';
 
+export async function createTokens(): Promise<Tokens> {
+    const name = nanoid(10);
+    const email = nanoid(10) + '@email.com';
+    const password = nanoid(10);
+
+    //register
+    const { body: tokens } = await request(app).post(`${apiBase}/user`).send({
+        name,
+        email,
+        password,
+    });
+    return tokens;
+}
 
 describe('USER API', () => {
     describe('POST /user', () => {
