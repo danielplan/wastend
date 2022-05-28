@@ -1,4 +1,4 @@
-import { ValidationError } from '../errors/validation.error';
+import ValidationError from '../errors/validation.error';
 import database, { ID_LENGTH } from '../database';
 import { nanoid } from 'nanoid';
 import { Knex } from 'knex';

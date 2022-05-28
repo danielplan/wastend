@@ -5,8 +5,11 @@ import { nanoid } from 'nanoid';
 import { apiBase } from './setupTest';
 import { Tokens } from '../src/services/auth.service';
 
+interface UserData extends Tokens {
+    userId: string;
+}
 
-export async function createTokens(): Promise<Tokens> {
+export async function createTokens(): Promise<UserData> {
     const name = nanoid(10);
     const email = nanoid(10) + '@email.com';
     const password = nanoid(10);
@@ -17,7 +20,8 @@ export async function createTokens(): Promise<Tokens> {
         email,
         password,
     });
-    return tokens;
+    const user = await User.getByEmail(email);
+    return {...tokens, userId: user.id};
 }
 
 describe('USER API', () => {

@@ -68,9 +68,39 @@ describe('HOUSEHOLD API', () => {
 
             expect(response.status).toBe(401);
         });
+        it('should fail if household does not exist', async () => {
+            const { accessToken, refreshToken } = await createTokens();
+            const name = nanoid(10);
+            const response = await request(app).put(`${apiBase}/household/123`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name,
+                });
+
+            expect(response.status).toBe(404);
+        });
     });
-    describe('POST /household/join/:id', function() {
+    describe('POST /household/:id/join', function() {
         it('should add member to household', async () => {
+            const name = nanoid(10);
+            const { accessToken, refreshToken } = await createTokens();
+            const { body: obj } = await request(app).post(`${apiBase}/household`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name,
+                });
+            const household = await Household.get(obj.id) as Household;
+            const { accessToken: accessToken1, refreshToken: refreshToken1, userId } = await createTokens();
+            const response = await request(app).post(`${apiBase}/household/${household.id}/join`)
+                .set('access-token', accessToken1)
+                .set('refresh-token', refreshToken1)
+                .send();
+            expect(response.status).toBe(200);
+            expect(await household.hasAccess(userId)).toBe(true);
+            const { userId: userId2 } = await createTokens();
+            expect(await household.hasAccess(userId2)).toBe(false);
         });
     });
     describe('GET /household', function() {

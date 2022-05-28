@@ -1,4 +1,4 @@
-export class ValidationError extends Error {
+export default class ValidationError extends Error {
     public errors: string[];
 
     constructor(errors: string[]) {

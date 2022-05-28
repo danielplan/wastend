@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { registerUser, loginUser, updateUser, getUser } from '../services/user.service';
-import { ValidationError } from '../errors/validation.error';
+import ValidationError from '../errors/validation.error';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
 export async function loginController(req: Request, res: Response) {

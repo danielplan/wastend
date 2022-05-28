@@ -1,4 +1,4 @@
-export class AuthError extends Error {
+export default class AuthError extends Error {
     constructor() {
         super();
     }

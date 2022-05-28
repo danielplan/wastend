@@ -1,8 +1,24 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
-import { createHousehold, getHouseholdsForUser, updateHousehold } from '../services/household.service';
-import { ValidationError } from '../errors/validation.error';
-import { AuthError } from '../errors/auth.error';
+import { createHousehold, getHouseholdsForUser, updateHousehold, joinHousehold } from '../services/household.service';
+import ValidationError from '../errors/validation.error';
+import AuthError from '../errors/auth.error';
+import NotFoundError from '../errors/not_found.error';
+
+export async function joinHouseholdController(req: AuthRequest, res: Response) {
+    const userId = req.user.userId;
+    const id = req.params.id;
+    try {
+        await joinHousehold(id, userId);
+    } catch (e) {
+        if(e instanceof NotFoundError) {
+            return res.status(404).json();
+        }
+        return res.status(500).json(e.message);
+    }
+    return res.status(200).json({success: true});
+}
+
 
 export async function updateHouseholdController(req: AuthRequest, res: Response) {
     const userId = req.user.userId;
@@ -16,6 +32,9 @@ export async function updateHouseholdController(req: AuthRequest, res: Response)
         }
         if(e instanceof AuthError) {
             return res.status(401).json();
+        }
+        if(e instanceof NotFoundError) {
+            return res.status(404).json();
         }
         return res.status(500).json(e.message);
     }
