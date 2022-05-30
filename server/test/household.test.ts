@@ -133,4 +133,27 @@ describe('HOUSEHOLD API', () => {
             expect(response.body[1].id).toBe(obj2.id);
         });
     });
+    describe('DELETE /household/:id', function() {
+        it('should create delete a specific household', async () => {
+            const name = nanoid(10);
+            const { accessToken, refreshToken } = await createTokens();
+            const { body: household } = await request(app).post(`${apiBase}/household`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name: name,
+                });
+            const h = await Household.get(household.id) as Household;
+            expect(h).toBeTruthy();
+            const response = await request(app).delete(`${apiBase}/household/${household.id}`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send();
+
+            expect(response.status).toBe(200);
+            const deletedH = await Household.get(household.id) as Household;
+            expect(deletedH).toBeFalsy();
+        });
+    });
+
 });

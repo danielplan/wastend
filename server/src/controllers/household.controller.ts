@@ -1,71 +1,67 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
-import { createHousehold, getHouseholdsForUser, updateHousehold, joinHousehold } from '../services/household.service';
-import ValidationError from '../errors/validation.error';
-import AuthError from '../errors/auth.error';
-import NotFoundError from '../errors/not_found.error';
+import {
+    createHousehold,
+    getHouseholdsForUser,
+    updateHousehold,
+    joinHousehold,
+    deleteHousehold,
+} from '../services/household.service';
 
-export async function joinHouseholdController(req: AuthRequest, res: Response) {
+export async function joinHouseholdController(req: AuthRequest, res: Response, next: NextFunction) {
     const userId = req.user.userId;
     const id = req.params.id;
     try {
         await joinHousehold(id, userId);
+        return res.status(200).json({ success: true });
     } catch (e) {
-        if(e instanceof NotFoundError) {
-            return res.status(404).json();
-        }
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json({success: true});
 }
 
+export async function deleteHouseholdController(req: AuthRequest, res: Response, next: NextFunction) {
+    const userId = req.user.userId;
+    const id = req.params.id;
+    try {
+        await deleteHousehold(id, userId);
+        return res.status(200).json({ success: true });
+    } catch (e) {
+        return next(e);
+    }
+}
 
-export async function updateHouseholdController(req: AuthRequest, res: Response) {
+export async function updateHouseholdController(req: AuthRequest, res: Response, next: NextFunction) {
     const userId = req.user.userId;
     const id = req.params.id;
     const { name } = req.body;
     try {
         await updateHousehold(name, id, userId);
+        return res.status(200).json({ success: true });
     } catch (e) {
-        if(e instanceof ValidationError) {
-            return res.status(500).json(e.errors);
-        }
-        if(e instanceof AuthError) {
-            return res.status(401).json();
-        }
-        if(e instanceof NotFoundError) {
-            return res.status(404).json();
-        }
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json({success: true});
 }
 
 
-export async function createHouseholdController(req: AuthRequest, res: Response) {
+export async function createHouseholdController(req: AuthRequest, res: Response, next: NextFunction) {
     const userId = req.user.userId;
     const { name } = req.body;
-    let household = null;
     try {
-        household = await createHousehold(name, userId);
+        const household = await createHousehold(name, userId);
+        return res.status(200).json(household);
     } catch (e) {
-        if (e instanceof ValidationError) {
-            return res.status(500).json(e.errors);
-        }
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json(household);
 }
 
-export async function getHouseholdsController(req: AuthRequest, res: Response) {
+export async function getHouseholdsController(req: AuthRequest, res: Response, next: NextFunction) {
     const userId = req.user.userId;
-    let households = null;
     try {
-        households = await getHouseholdsForUser(userId);
+        const households = await getHouseholdsForUser(userId);
+        return res.status(200).json(households);
     } catch (e) {
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json(households);
 }
 
 

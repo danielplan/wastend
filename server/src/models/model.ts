@@ -77,6 +77,9 @@ export default abstract class Model {
         this.id = id;
         await this.getQuery().insert({ ...this.toDBObject(), id });
     }
+    public async delete() {
+        await this.getQuery().delete().where('id', this.id);
+    }
 
 
     public getTableName(): string {

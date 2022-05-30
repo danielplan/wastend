@@ -1,56 +1,47 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { registerUser, loginUser, updateUser, getUser } from '../services/user.service';
-import ValidationError from '../errors/validation.error';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
-export async function loginController(req: Request, res: Response) {
+export async function loginController(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
-    let tokens = null;
     try {
-        tokens = await loginUser(email, password);
+        const tokens = await loginUser(email, password);
+        return res.status(200).json(tokens);
     } catch (e) {
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json(tokens);
 }
 
-export async function registerController(req: Request, res: Response) {
+export async function registerController(req: Request, res: Response, next: NextFunction) {
     const { name, email, password } = req.body;
-    let tokens = null;
+
     try {
-        tokens = await registerUser(name, email, password);
+        const tokens = await registerUser(name, email, password);
+        return res.status(200).json(tokens);
     } catch (e) {
-        if(e instanceof ValidationError) {
-            return res.status(500).json(e.errors);
-        }
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json(tokens);
 }
 
-export async function updateUserController(req: AuthRequest, res: Response) {
+export async function updateUserController(req: AuthRequest, res: Response, next: NextFunction) {
     const id = req.user.userId;
     const { name, email, password } = req.body;
     try {
         await updateUser(id, name, email, password);
+        return res.status(200).json({ success: true });
     } catch (e) {
-        if(e instanceof ValidationError) {
-            return res.status(500).json(e.errors);
-        }
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json({success: true});
 }
 
-export async function getUserController(req: AuthRequest, res: Response) {
+export async function getUserController(req: AuthRequest, res: Response, next: NextFunction) {
     const id = req.user.userId;
-    let data;
     try {
-        data = await getUser(id);
+        const data = await getUser(id);
+        return res.status(200).json(data);
     } catch (e) {
-        return res.status(500).json(e.message);
+        return next(e);
     }
-    return res.status(200).json(data);
 }
 
 
