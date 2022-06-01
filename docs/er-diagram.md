@@ -7,7 +7,7 @@ erDiagram
     User {
         string id
         string name
-        string username
+        string email
         string password_hash
     }
     Grocery {

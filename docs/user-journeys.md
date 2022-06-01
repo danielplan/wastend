@@ -35,13 +35,21 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     actor User
-    User ->> UserController: POST /user/register
-    UserController ->> UserService: registerUser(req)
+    User ->> UserController: registerController(req, res)
+    UserController ->> UserService: registerUser(name, email, password)
     activate UserService
-    UserService ->> AuthService: register(req.household)
-    AuthService ->> User: new User(req.user)
-    AuthService ->> User: save()
-    UserService ->> AuthService: login(req.user)
+    UserService ->> AuthHelpers: encryptPassword(password)
+    AuthHelpers ->> UserService: passwordHash
+    UserService ->> UserModel: new User(name, email, password)
+    UserService ->> UserModel: save()
+    UserModel ->> UserModel: validate()
+    UserService ->> AuthService: createSession(user)
+    activate AuthService
+    AuthService ->> SessionModel: new Session(userId)
+    AuthService ->> SessionModel: save()
+    SessionModel -->> AuthService: Tokens
+    AuthService -->> UserService: Tokens
+    deactivate AuthService
     UserService -->> UserController: Tokens
     deactivate UserService
     UserController -->> User: Tokens
@@ -54,13 +62,13 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor User
-    User ->> HouseholdController: POST /household/:householdId/join
-    HouseholdController ->> HouseholdService: createHousehold(req)
+    User ->> HouseholdController: createHouseholdController(req, res)
+    HouseholdController ->> HouseholdService: createHousehold(name, userId)
     activate HouseholdService
-    HouseholdService ->> HouseholdService: validateHousehold(req.household)
     HouseholdService ->> Household: new Household(req.household)
     HouseholdService ->> Household: save()
-    HouseholdService ->> Household: addUser(req.user)
+    Household ->> Household: validate()
+    HouseholdService ->> Household: addUser(user)
     HouseholdService -->> HouseholdController: Household
     deactivate HouseholdService
     HouseholdController -->> User: Household
@@ -71,11 +79,11 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor User
-    User ->> HouseholdController: POST /household
-    HouseholdController ->> HouseholdService: addUserToHousehold(req)
+    User ->> HouseholdController: joinHouseholdController(req, res)
+    HouseholdController ->> HouseholdService: joinHousehold(userId, householdId)
     activate HouseholdService
-    HouseholdService ->> Household: get(req.householdId)
-    HouseholdService ->> Household: addUser(req.user)
+    HouseholdService ->> Household: get(householdId)
+    HouseholdService ->> Household: addUser(userId)
     HouseholdService -->> HouseholdController: Household
     deactivate HouseholdService
     HouseholdController -->> User: Household

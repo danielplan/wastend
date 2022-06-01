@@ -62,17 +62,17 @@ export default abstract class Model {
             throw new ValidationError(validation);
         }
         if (this.id) {
-            await this.update(this.id);
+            await this.update();
         } else {
-            await this.add();
+            await this.create();
         }
     }
 
-    protected async update(id: string): Promise<void> {
-        await this.getQuery().update(this.toDBObject()).where('id', id);
+    protected async update(): Promise<void> {
+        await this.getQuery().update(this.toDBObject()).where('id', this.id);
     }
 
-    protected async add(): Promise<void> {
+    protected async create(): Promise<void> {
         const id = await this.getFreeId();
         this.id = id;
         await this.getQuery().insert({ ...this.toDBObject(), id });

@@ -33,12 +33,12 @@ export default class User extends Model {
         return errors;
     }
 
-    protected async add(): Promise<void> {
+    protected async create(): Promise<void> {
         const sameEmail = await this.getQuery().where('email', this.email).first();
         if (sameEmail) {
             throw new Error('label.email_already_used');
         }
-        await super.add();
+        await super.create();
     }
 
     static async getByEmail(email: string): Promise<User> | null {

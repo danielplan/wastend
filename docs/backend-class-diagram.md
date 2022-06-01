@@ -5,15 +5,34 @@ classDiagram
 class Model {
     <<abstract>>
     -tableName: string
-    +get(id: string)
+    -id: string
+    +static get(id: string)
     +save()
-    -wrap(items: Model[])
+    +validate(): string[]
+    +toDBObject()
+    +fromDBObject()
+    +delete()
+    -wrap(items)
 }
 class User {
     +id: string
     +name: string
-    +username: string
-    +password: string
+    +email: string
+    +password: string?
+    +passwordHash: string
+    +validate(): string[]
+    +static getByEmail(email): User
+}
+class Session {
+    +id: string
+    +userId: string
+    +validate(): string[]
+}
+class HouseholdHasUser {
+    +id: string
+    +userId: string
+    +householdId: string
+    +validate(): string[]
 }
 class Grocery {
     +id: string
@@ -38,7 +57,10 @@ class Stock {
 class Household {
     +id: string
     +name: string
-    +addUser(user)
+    +addUser(userId)
+    +hasAccess(userId)
+    +static getForUser(userId)
+    +validate(): string[]
 }
 class Ingredient {
     +id: string
@@ -76,6 +98,8 @@ Model <|-- Grocery
 Model <|-- GroceryCategory
 Model <|-- Recipe
 Model <|-- Ingredient
+Model <|-- Session
+Model <|-- HouseholdHasUser
 Household <-- HouseholdService 
 Grocery <-- GroceryService 
 GroceryService <-- InventoryService 
