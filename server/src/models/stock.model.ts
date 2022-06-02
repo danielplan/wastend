@@ -1,6 +1,7 @@
 import Model from './model';
 import { Table } from '../helpers/decorators.helpers';
 import Household from './household.model';
+import Grocery from './grocery.model';
 
 interface StockData {
     id?: string;
@@ -9,6 +10,11 @@ interface StockData {
     amount: number;
     unit: string;
     idealAmount: number;
+}
+
+
+export interface InventoryData extends StockData {
+    grocery: string;
 }
 
 @Table('stock')
@@ -34,8 +40,16 @@ export default class Stock extends Model {
         return errors;
     }
 
-    public static async getForHousehold(groceryId: string, houseHoldId: string) {
-        return this.getQuery().where('groceryId', groceryId).where('householdId', houseHoldId).first();
+    public static async getForHousehold(groceryId: string, householdId: string): Promise<Stock> {
+        const stock = await this.getQuery().where('groceryId', groceryId).where('householdId', householdId).first();
+        return this.wrap(stock);
+    }
+
+    public static async getInventory(householdId: string): Promise<InventoryData[]> {
+        return this.getQuery()
+            .where('householdId', householdId)
+            .join(Grocery.getTableName(), 'groceryId', '=', 'grocery.id')
+            .select('stock.id as id', 'grocery.name as grocery', 'stock.amount as amount', 'stock.unit as unit', 'stock.idealAmount as idealAmount');
     }
 
     public async getHousehold(): Promise<Household> {

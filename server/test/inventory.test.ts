@@ -168,7 +168,7 @@ describe('Inventory API', () => {
                 .send({
                     name: name2,
                     amount: amount2,
-                    unit: unit2
+                    unit: unit2,
                 });
             const updatedStock = await Stock.get(stock.id) as Stock;
             expect(response.status).toBe(200);
@@ -206,10 +206,115 @@ describe('Inventory API', () => {
                 .set('refresh-token', rt2)
                 .send({
                     amount: amount2,
-                    unit: unit2
+                    unit: unit2,
                 });
             expect(response.status).toBe(200);
             expect(response2.status).toBe(401);
+        });
+    });
+    describe('GET /inventory/:id', () => {
+        it('should get stock for household', async () => {
+            const { household, accessToken, refreshToken } = await createHousehold();
+            const name = nanoid(10);
+            const name2 = nanoid(10);
+            const name3 = nanoid(10);
+            const idealAmount = 10;
+            const unit = 'kg';
+            const unit2 = 'xx';
+            const amount = 5;
+            const amount2 = 20;
+
+            await request(app).post(`${apiBase}/inventory`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name,
+                    idealAmount,
+                    unit,
+                    amount,
+                    householdId: household.id,
+                });
+            await request(app).post(`${apiBase}/inventory`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name: name2,
+                    idealAmount,
+                    amount: amount2,
+                    unit: unit2,
+                    householdId: household.id,
+                });
+            await request(app).post(`${apiBase}/inventory`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name: name3,
+                    idealAmount,
+                    amount: amount2,
+                    unit: unit2,
+                    householdId: household.id,
+                });
+            const response = await request(app).get(`${apiBase}/inventory/${household.id}`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send();
+            expect(response.status).toBe(200);
+            expect(response.body.length).toBe(3);
+            expect(response.body[0].grocery).toBe(name);
+            expect(response.body[1].grocery).toBe(name2);
+            expect(response.body[2].grocery).toBe(name3);
+
+        });
+        describe('GET /inventory/:id', () => {
+            it('should get stock for household', async () => {
+                const { household, accessToken, refreshToken } = await createHousehold();
+                const name = 'apple';
+                const name2 = 'apple 2';
+                const name3 = 'apple 3';
+                const idealAmount = 10;
+                const unit = 'kg';
+                const unit2 = 'xx';
+                const amount = 5;
+                const amount2 = 20;
+
+                await request(app).post(`${apiBase}/inventory`)
+                    .set('access-token', accessToken)
+                    .set('refresh-token', refreshToken)
+                    .send({
+                        name,
+                        idealAmount,
+                        unit,
+                        amount,
+                        householdId: household.id,
+                    });
+                await request(app).post(`${apiBase}/inventory`)
+                    .set('access-token', accessToken)
+                    .set('refresh-token', refreshToken)
+                    .send({
+                        name: name2,
+                        idealAmount,
+                        amount: amount2,
+                        unit: unit2,
+                        householdId: household.id,
+                    });
+                await request(app).post(`${apiBase}/inventory`)
+                    .set('access-token', accessToken)
+                    .set('refresh-token', refreshToken)
+                    .send({
+                        name: name3,
+                        idealAmount,
+                        amount: amount2,
+                        unit: unit2,
+                        householdId: household.id,
+                    });
+                const response = await request(app).get(`${apiBase}/inventory/suggestions/apple`);
+                expect(response.status).toBe(200);
+                expect(response.body.length).toBe(3);
+                expect(response.body[0].name).toBe(name);
+                expect(response.body[1].name).toBe(name2);
+                expect(response.body[2].name).toBe(name3);
+
+            });
         });
     });
 });

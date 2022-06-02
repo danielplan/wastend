@@ -14,11 +14,18 @@ export default class Grocery extends Model {
         super(data);
     }
     validate(): string[] {
-        return [];
+        const errors: string[] = [];
+        if (!this.name) errors.push('label.enter_name');
+        return errors;
     }
 
     public static async getByName(name: string) {
-        return this.getQuery().where('name', name).first();
+        const grocery = await this.getQuery().where('name', name).first();
+        return this.wrap(grocery);
     }
 
+    static async getSimilar(name: string): Promise<Grocery[]> {
+        const groceries = await this.getQuery().whereLike('name', name + '%').orderBy('name', 'asc').limit(5);
+        return this.wrap(groceries);
+    }
 }

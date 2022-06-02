@@ -100,8 +100,8 @@ export default abstract class Model {
 
     protected static wrap(data: any) {
         if(data == null) return null;
-        if (data instanceof Array) {
-            return data.map((d) => this.wrapSingle(d));
+        if (Array.isArray(data)) {
+            return data.map((d: any) => this.wrapSingle(d));
         }
         return this.wrapSingle(data);
     }

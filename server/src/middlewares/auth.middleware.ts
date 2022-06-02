@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { signJWT, verifyJWT } from '../helpers/auth.helpers';
 import Session from '../models/session.model';
 import { AccessToken, RefreshToken } from '../services/auth.service';
+import AuthError from '../errors/auth.error';
 
 export interface AuthRequest extends Request {
     user: AccessToken;
@@ -12,7 +13,7 @@ export default async function requireAuth(req: AuthRequest, res: Response, next:
     const refreshToken = req.headers['refresh-token'] as string;
 
     if (!accessToken) {
-        return res.status(401).send();
+        return next(new AuthError());
     }
 
 
@@ -26,13 +27,13 @@ export default async function requireAuth(req: AuthRequest, res: Response, next:
     payload = expired && refreshToken ? verifyJWT(refreshToken).payload as RefreshToken : null;
 
     if (!payload) {
-        return res.status(401).send();
+        return next(new AuthError());
     }
 
     const session = await Session.get(payload.sessionId) as Session;
 
     if (!session) {
-        return res.status(401).send();
+        return next(new AuthError());
     }
 
     const newAccessToken = signJWT(session, '5s');
