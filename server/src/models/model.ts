@@ -32,7 +32,7 @@ export default abstract class Model {
         for (let key of keys) {
             if (!isDBIgnored(this, key)) {
                 const value = data[key]['value'];
-                if (value) {
+                if (value != null) {
                     obj[key] = value;
                 }
             }
@@ -42,7 +42,7 @@ export default abstract class Model {
 
     public fromDBObject(data: any): void {
         for (let key of Object.keys(data)) {
-            if(data[key]) {
+            if(data[key] != null) {
                 try {
                     Object.defineProperty(this, key, {
                         value: data[key],

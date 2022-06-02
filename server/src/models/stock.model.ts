@@ -27,8 +27,8 @@ export default class Stock extends Model {
         const errors = [];
         if(!this.groceryId) errors.push('Grocery not found');
         if(!this.householdId) errors.push('Household not found');
-        if(!this.amount || !Number.parseFloat(this.amount.toString()) || this.amount < 0) errors.push('label.enter_amount');
-        if(!this.idealAmount || !Number.parseFloat(this.idealAmount.toString()) || this.idealAmount < 0) errors.push('label.enter_ideal_amount');
+        if(this.amount == null || isNaN(this.amount) || this.amount < 0) errors.push('label.enter_amount');
+        if(this.idealAmount == null || isNaN(this.idealAmount) || this.idealAmount <= 0) errors.push('label.enter_ideal_amount');
         if(!this.unit) errors.push('label.enter_unit');
         return errors;
     }

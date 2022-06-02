@@ -28,7 +28,7 @@ export default class User extends Model {
             errors.push('label.name_too_short');
         if (!this.email || !/(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))/.test(this.email))
             errors.push('label.invalid_email');
-        if (this.password && this.password.length < 6 || this.passwordHash && this.passwordHash.length <= 0)
+        if (this.password != null && this.password.length < 6 || this.passwordHash != null && this.passwordHash.length <= 0)
             errors.push('label.invalid_password');
         return errors;
     }
