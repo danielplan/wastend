@@ -23,7 +23,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: household.id
+                    householdId: household.id,
                 });
             expect(response.status).toBe(200);
             expect(response.body.grocery.name).toBe(name);
@@ -52,7 +52,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: household.id
+                    householdId: household.id,
                 });
             expect(response.status).toBe(500);
         });
@@ -72,7 +72,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: household.id
+                    householdId: household.id,
                 });
             const response2 = await request(app).post(`${apiBase}/inventory`)
                 .set('access-token', at2)
@@ -82,7 +82,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: h2.id
+                    householdId: h2.id,
                 });
             expect(response.status).toBe(200);
             expect(response2.status).toBe(200);
@@ -105,7 +105,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: household.id
+                    householdId: household.id,
                 });
             const response2 = await request(app).post(`${apiBase}/inventory`)
                 .set('access-token', at2)
@@ -115,7 +115,7 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: household.id
+                    householdId: household.id,
                 });
             expect(response.status).toBe(200);
             expect(response2.status).toBe(401);
@@ -135,9 +135,81 @@ describe('Inventory API', () => {
                     idealAmount,
                     unit,
                     amount,
-                    householdId: 'not-found'
+                    householdId: 'not-found',
                 });
             expect(response.status).toBe(404);
+        });
+    });
+    describe('PUT /inventory/:id', () => {
+        it('should update only stock data correctly', async () => {
+            const name = nanoid(10);
+            const name2 = nanoid(10);
+            const idealAmount = 10;
+            const unit = 'kg';
+            const unit2 = 'xx';
+            const amount = 5;
+            const amount2 = 20;
+            const { household, accessToken, refreshToken } = await createHousehold();
+
+            const response = await request(app).post(`${apiBase}/inventory`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name,
+                    idealAmount,
+                    unit,
+                    amount,
+                    householdId: household.id,
+                });
+            const stock = await Stock.get(response.body.stock.id) as Stock;
+            const response2 = await request(app).put(`${apiBase}/inventory/${stock.id}`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name: name2,
+                    amount: amount2,
+                    unit: unit2
+                });
+            const updatedStock = await Stock.get(stock.id) as Stock;
+            expect(response.status).toBe(200);
+            expect(response2.status).toBe(200);
+            expect(stock.amount).toBe(amount);
+            expect(updatedStock.amount).toBe(amount2);
+            expect(updatedStock.unit).toBe(unit2);
+            expect(updatedStock.idealAmount).toBe(stock.idealAmount);
+            expect(updatedStock.groceryId).toBe(stock.groceryId);
+            expect(updatedStock.householdId).toBe(stock.householdId);
+        });
+        it('should update only stock data ', async () => {
+            const name = nanoid(10);
+            const idealAmount = 10;
+            const unit = 'kg';
+            const unit2 = 'xx';
+            const amount = 5;
+            const amount2 = 20;
+            const { household, accessToken, refreshToken } = await createHousehold();
+            const { accessToken: at2, refreshToken: rt2 } = await createHousehold();
+
+            const response = await request(app).post(`${apiBase}/inventory`)
+                .set('access-token', accessToken)
+                .set('refresh-token', refreshToken)
+                .send({
+                    name,
+                    idealAmount,
+                    unit,
+                    amount,
+                    householdId: household.id,
+                });
+            const stock = await Stock.get(response.body.stock.id) as Stock;
+            const response2 = await request(app).put(`${apiBase}/inventory/${stock.id}`)
+                .set('access-token', at2)
+                .set('refresh-token', rt2)
+                .send({
+                    amount: amount2,
+                    unit: unit2
+                });
+            expect(response.status).toBe(200);
+            expect(response2.status).toBe(401);
         });
     });
 });

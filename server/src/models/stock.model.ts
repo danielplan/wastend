@@ -1,5 +1,6 @@
 import Model from './model';
 import { Table } from '../helpers/decorators.helpers';
+import Household from './household.model';
 
 interface StockData {
     id?: string;
@@ -35,6 +36,10 @@ export default class Stock extends Model {
 
     public static async getForHousehold(groceryId: string, houseHoldId: string) {
         return this.getQuery().where('groceryId', groceryId).where('householdId', houseHoldId).first();
+    }
+
+    public async getHousehold(): Promise<Household> {
+        return await Household.get(this.householdId) as Household;
     }
 
 }
