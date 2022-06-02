@@ -1,5 +1,5 @@
 import Model from './model';
-import { Table } from './decorators';
+import { Table } from '../helpers/decorators.helpers';
 import HouseholdHasUser from './household_user.model';
 
 interface HouseholdData {

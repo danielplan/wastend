@@ -1,5 +1,5 @@
 import Model from './model';
-import {DBIgnore, Table} from './decorators';
+import {DBIgnore, Table} from '../helpers/decorators.helpers';
 
 interface UserData {
     id?: string,

@@ -14,10 +14,6 @@ erDiagram
         string id
         string name
     }
-    GroceryCategory {
-        string id
-        string name
-    }
     Stock {
         string id
         string item
@@ -44,7 +40,6 @@ erDiagram
     Household }|--|{ User : livesIn
     Household }|--|o Stock : has
     Recipe }|--|o User : shares
-    GroceryCategory o|--|{ Grocery : has
     User o|--|{ UserSession : has
     User o|--|{ Stock : owns
     Grocery o|--|{ Stock : of

@@ -96,19 +96,19 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     actor User
-    User ->> InventoryController: POST /inventory
-    InventoryController ->> InventoryService: addGroceryToHousehold(req)
+    User ->> InventoryController: addGroceryController(req, res)
+    InventoryController ->> InventoryService: addGrocery(name, householdId, idealAmount, unit, amount)
     activate InventoryService
-    InventoryService ->> GroceryService: getGrocery(req)
+    InventoryService ->> GroceryService: getGrocery(name)
     activate GroceryService
-    GroceryService ->> Grocery: findGrocery(req.grocery)
+    GroceryService ->> Grocery: findByName(name)
     alt Grocery does not exist yet
-        GroceryService ->> Grocery: new Grocery(req.grocery)
+        GroceryService ->> Grocery: new Grocery(name)
         GroceryService ->> Grocery: save()
     end
     GroceryService -->> InventoryService: Grocery
     deactivate GroceryService
-    InventoryService ->> Stock: new Stock(req.amount, req.household, grocery.id)
+    InventoryService ->> Stock: new Stock(amount, householdId, groceryId, idealAmount, unit)
     InventoryService ->> Stock: save()
     InventoryService -->> InventoryController: Grocery
     deactivate InventoryService
@@ -123,8 +123,8 @@ sequenceDiagram
     User ->> InventoryController: POST /inventory/stock
     InventoryController ->> InventoryService: updateStock(req)
     activate InventoryService
-    InventoryService ->> Stock: getForHousehold(req.groceryId, req.householdId)
-    InventoryService ->> Stock: setAmount(req.amount)
+    InventoryService ->> Stock: getForHousehold(groceryId, householdId)
+    InventoryService ->> Stock: setAmount(amount)
     InventoryService ->> Stock: save()
     InventoryService -->> InventoryController: Amount
     deactivate InventoryService
