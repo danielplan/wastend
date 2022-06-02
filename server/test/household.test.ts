@@ -2,8 +2,26 @@ import { nanoid } from 'nanoid';
 import request from 'supertest';
 import app from '../src/app';
 import { apiBase } from './setupTest';
-import { createTokens } from './user.test';
-import Household from '../src/models/household.model';
+import { createTokens, UserData } from './user.test';
+import Household, { HouseholdData } from '../src/models/household.model';
+
+export interface UserHouseholdData extends UserData {
+    household: HouseholdData;
+}
+
+export async function createHousehold(): Promise<UserHouseholdData> {
+    const name = nanoid(10);
+    const userData = await createTokens();
+
+    //register
+    const { body: household } = await request(app).post(`${apiBase}/household`)
+        .set('access-token', userData.accessToken)
+        .set('refresh-token', userData.refreshToken)
+        .send({
+            name,
+        });
+    return {...userData, household};
+}
 
 describe('HOUSEHOLD API', () => {
     describe('POST /household', function() {

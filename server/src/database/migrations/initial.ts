@@ -22,20 +22,17 @@ export async function up(knex: Knex): Promise<void> {
             table.string('id', ID_LENGTH).primary();
             table.string('userId', ID_LENGTH).references('id').inTable('user').notNullable();
         })
-        .createTable('grocery_category', (table) => {
-            table.string('id', ID_LENGTH).primary();
-            table.string('name').notNullable();
-        })
         .createTable('grocery', (table) => {
             table.string('id', ID_LENGTH).primary();
             table.string('name').notNullable();
-            table.string('categoryId', ID_LENGTH).references('id').inTable('grocery_category').notNullable();
         })
         .createTable('stock', (table) => {
             table.string('id', ID_LENGTH).primary();
             table.string('householdId', ID_LENGTH).references('id').inTable('household').notNullable();
-            table.string('userId', ID_LENGTH).references('id').inTable('user').notNullable();
             table.string('groceryId', ID_LENGTH).references('id').inTable('grocery').notNullable();
+            table.decimal('amount').notNullable();
+            table.decimal('idealAmount').notNullable();
+            table.string('unit').notNullable();
         });
 }
 
@@ -46,7 +43,6 @@ export async function down(knex: Knex): Promise<void> {
         .dropTable('user')
         .dropTable('stock')
         .dropTable('grocery')
-        .dropTable('grocery_category')
         .dropTable('household')
         .dropTable('household_has_user');
 }

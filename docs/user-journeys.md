@@ -101,7 +101,7 @@ sequenceDiagram
     activate InventoryService
     InventoryService ->> GroceryService: getGrocery(name)
     activate GroceryService
-    GroceryService ->> Grocery: findByName(name)
+    GroceryService ->> Grocery: getByName(name)
     alt Grocery does not exist yet
         GroceryService ->> Grocery: new Grocery(name)
         GroceryService ->> Grocery: save()

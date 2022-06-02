@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid';
 import { apiBase } from './setupTest';
 import { Tokens } from '../src/services/auth.service';
 
-interface UserData extends Tokens {
+export interface UserData extends Tokens {
     userId: string;
 }
 
