@@ -26,8 +26,7 @@ export default class Household extends Model {
     }
 
     public async hasAccess(userId: string): Promise<boolean> {
-        const connection = await HouseholdHasUser.getQuery().where('householdId', this.id).where('userId', userId).first();
-        return !!connection;
+        return HouseholdHasUser.checkAccess(userId, this.id);
     }
 
     public static async getForUser(userId: string) {

@@ -25,4 +25,8 @@ export default class HouseholdHasUser extends Model {
         return errors;
     }
 
+    public static async checkAccess(userId: string, householdId: string): Promise<boolean> {
+        const result = await HouseholdHasUser.getQuery().where('householdId', householdId).where('userId', userId).first();
+        return !!result;
+    }
 }
