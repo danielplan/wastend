@@ -15,15 +15,45 @@ export default abstract class Model {
         this.fromDBObject(data);
     }
 
-    public abstract validate(): string[];
-
     public static async get(id: string): Promise<Model> | null {
-        if(!id) {
+        if (!id) {
             throw new Error('No id given at get');
         }
         const result = await this.getQuery().where('id', id).first();
         return this.wrap(result);
     }
+
+    public static getTableName(): string {
+        return this.prototype.TABLE_NAME;
+    }
+
+    protected static getQuery(): Knex.QueryBuilder {
+        return database(this.getTableName());
+    }
+
+    protected static wrap(data: any) {
+        if (data == null) return null;
+        if (Array.isArray(data)) {
+            return data.map((d: any) => this.wrapSingle(d));
+        }
+        return this.wrapSingle(data);
+    }
+
+    private static wrapSingle(data: any) {
+        let obj: any = {};
+
+        for (let key of Object.keys(data)) {
+            obj[key] = {
+                writable: true,
+                configurable: true,
+                enumerable: true,
+                value: data[key],
+            };
+        }
+        return Object.create(this.prototype, obj);
+    }
+
+    public abstract validate(): string[];
 
     public toDBObject(): any {
         const data = Object.getOwnPropertyDescriptors(this);
@@ -42,7 +72,7 @@ export default abstract class Model {
 
     public fromDBObject(data: any): void {
         for (let key of Object.keys(data)) {
-            if(data[key] != null) {
+            if (data[key] != null) {
                 try {
                     Object.defineProperty(this, key, {
                         value: data[key],
@@ -68,6 +98,14 @@ export default abstract class Model {
         }
     }
 
+    public async delete() {
+        await this.getQuery().delete().where('id', this.id);
+    }
+
+    public getTableName(): string {
+        return this.TABLE_NAME;
+    }
+
     protected async update(): Promise<void> {
         await this.getQuery().update(this.toDBObject()).where('id', this.id);
     }
@@ -77,47 +115,9 @@ export default abstract class Model {
         this.id = id;
         await this.getQuery().insert({ ...this.toDBObject(), id });
     }
-    public async delete() {
-        await this.getQuery().delete().where('id', this.id);
-    }
-
-
-    public getTableName(): string {
-        return this.TABLE_NAME;
-    }
-
-    public static getTableName(): string {
-        return this.prototype.TABLE_NAME;
-    }
 
     protected getQuery(): Knex.QueryBuilder {
         return database(this.getTableName());
-    }
-
-    protected static getQuery(): Knex.QueryBuilder {
-        return database(this.getTableName());
-    }
-
-    protected static wrap(data: any) {
-        if(data == null) return null;
-        if (Array.isArray(data)) {
-            return data.map((d: any) => this.wrapSingle(d));
-        }
-        return this.wrapSingle(data);
-    }
-
-    private static wrapSingle(data: any) {
-        let obj: any = {};
-
-        for (let key of Object.keys(data)) {
-            obj[key] = {
-                writable: true,
-                configurable: true,
-                enumerable: true,
-                value: data[key],
-            };
-        }
-        return Object.create(this.prototype, obj);
     }
 
     private async getFreeId(): Promise<string> {

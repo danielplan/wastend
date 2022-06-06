@@ -40,6 +40,6 @@ export default async function requireAuth(req: AuthRequest, res: Response, next:
 
     req.user = verifyJWT(newAccessToken).payload as AccessToken;
 
-    res.setHeader('access-token', newAccessToken)
+    res.setHeader('access-token', newAccessToken);
     return next();
 }

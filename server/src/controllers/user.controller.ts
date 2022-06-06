@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { registerUser, loginUser, updateUser, getUser } from '../services/user.service';
+import { getUser, loginUser, registerUser, updateUser } from '../services/user.service';
 import { AuthRequest } from '../middlewares/auth.middleware';
 
 export async function loginController(req: Request, res: Response, next: NextFunction) {

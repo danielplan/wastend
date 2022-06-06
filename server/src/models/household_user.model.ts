@@ -18,15 +18,15 @@ export default class HouseholdHasUser extends Model {
         super(data);
     }
 
+    public static async checkAccess(userId: string, householdId: string): Promise<boolean> {
+        const result = await HouseholdHasUser.getQuery().where('householdId', householdId).where('userId', userId).first();
+        return !!result;
+    }
+
     validate(): string[] {
         const errors: string[] = [];
         if (!this.userId) errors.push('No user id given in household creation');
         if (!this.householdId) errors.push('No household id given household creation');
         return errors;
-    }
-
-    public static async checkAccess(userId: string, householdId: string): Promise<boolean> {
-        const result = await HouseholdHasUser.getQuery().where('householdId', householdId).where('userId', userId).first();
-        return !!result;
     }
 }

@@ -17,6 +17,11 @@ export default class Household extends Model {
         super(data);
     }
 
+    public static async getForUser(userId: string) {
+        const connections = await this.getQuery().select('householdId as id', 'name').join('household_has_user', 'household_has_user.householdId', '=', 'household.id').where('household_has_user.userId', userId);
+        return this.wrap(connections);
+    }
+
     public async addUser(userId: string) {
         const connection = new HouseholdHasUser({
             userId,
@@ -27,11 +32,6 @@ export default class Household extends Model {
 
     public async hasAccess(userId: string): Promise<boolean> {
         return HouseholdHasUser.checkAccess(userId, this.id);
-    }
-
-    public static async getForUser(userId: string) {
-        const connections = await this.getQuery().select('householdId as id', 'name').join('household_has_user', 'household_has_user.householdId', '=', 'household.id').where('household_has_user.userId', userId);
-        return this.wrap(connections);
     }
 
     validate(): string[] {

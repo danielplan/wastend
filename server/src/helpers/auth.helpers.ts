@@ -12,19 +12,19 @@ export function signJWT(payload: object, expiresIn: string | number) {
 export function verifyJWT(token: string) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_TOKEN);
-        return {payload: decoded, expired: false};
+        return { payload: decoded, expired: false };
     } catch (error) {
         console.log(error);
-        return {payload: null, expired: true};
+        return { payload: null, expired: true };
     }
 }
 
 export async function encryptPassword(password: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
         bcrypt.genSalt(10, function(error, salt) {
-            if(error) reject(error);
+            if (error) reject(error);
             bcrypt.hash(password, salt, function(err, hash) {
-                if(error) reject(error);
+                if (error) reject(error);
                 resolve(hash);
             });
         });

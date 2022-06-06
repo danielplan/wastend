@@ -2,10 +2,10 @@ import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import {
     createHousehold,
-    getHouseholdsForUser,
-    updateHousehold,
-    joinHousehold,
     deleteHousehold,
+    getHouseholdsForUser,
+    joinHousehold,
+    updateHousehold,
 } from '../services/household.service';
 
 export async function joinHouseholdController(req: AuthRequest, res: Response, next: NextFunction) {

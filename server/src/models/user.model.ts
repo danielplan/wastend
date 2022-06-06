@@ -1,5 +1,5 @@
 import Model from './model';
-import {DBIgnore, Table} from '../helpers/decorators.helpers';
+import { DBIgnore, Table } from '../helpers/decorators.helpers';
 
 interface UserData {
     id?: string,
@@ -22,6 +22,11 @@ export default class User extends Model {
         super(data);
     }
 
+    static async getByEmail(email: string): Promise<User> | null {
+        const result = await this.getQuery().where('email', email).first();
+        return this.wrap(result);
+    }
+
     validate(): string[] {
         const errors: string[] = [];
         if (!this.name || this.name.length <= 3)
@@ -39,11 +44,6 @@ export default class User extends Model {
             throw new Error('label.email_already_used');
         }
         await super.create();
-    }
-
-    static async getByEmail(email: string): Promise<User> | null {
-        const result = await this.getQuery().where('email', email).first();
-        return this.wrap(result);
     }
 
 }

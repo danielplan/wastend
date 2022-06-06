@@ -6,6 +6,7 @@ export interface KnexConfig {
     staging: Knex.Config;
     production: Knex.Config;
 }
+
 const knexConfig: KnexConfig = {
     development: {
         client: 'sqlite3',
@@ -15,8 +16,8 @@ const knexConfig: KnexConfig = {
         },
         migrations: {
             tableName: 'knex_migrations',
-            directory: __dirname + '/migrations'
-        }
+            directory: __dirname + '/migrations',
+        },
     },
 
     test: {
@@ -27,8 +28,8 @@ const knexConfig: KnexConfig = {
         },
         migrations: {
             tableName: 'knex_migrations',
-            directory: __dirname + '/migrations'
-        }
+            directory: __dirname + '/migrations',
+        },
     },
 
     staging: {
@@ -44,7 +45,7 @@ const knexConfig: KnexConfig = {
         },
         migrations: {
             tableName: 'knex_migrations',
-            directory: __dirname + '/migrations'
+            directory: __dirname + '/migrations',
         },
     },
 

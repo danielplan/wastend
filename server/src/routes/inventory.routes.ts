@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import {
     addGroceryController,
-    getInventoryController, getSimilarGroceriesController,
+    getInventoryController,
+    getSimilarGroceriesController,
     updateStockController,
 } from '../controllers/inventory.controller';
 import requireAuth from '../middlewares/auth.middleware';

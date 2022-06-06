@@ -1,5 +1,5 @@
 import { AuthRequest } from '../middlewares/auth.middleware';
-import { addGrocery, updateStock, getInventory, getSimilarGroceries } from '../services/inventory.service';
+import { addGrocery, getInventory, getSimilarGroceries, updateStock } from '../services/inventory.service';
 import { NextFunction, Response } from 'express';
 
 export async function updateStockController(req: AuthRequest, res: Response, next: NextFunction) {
